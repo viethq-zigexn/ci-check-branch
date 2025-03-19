@@ -1,0 +1,28 @@
+name: Validate Branch Name for Merge into Main
+
+on:
+  pull_request:
+    branches:
+      - main  # Chạy CI chỉ khi có pull request merge vào nhánh `main`
+
+jobs:
+  validate_branch_name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Validate branch name
+        run: |
+          # Lấy tên nhánh từ pull request
+          PR_BRANCH=$(echo $GITHUB_HEAD_REF)
+
+          # Kiểm tra tên nhánh
+          if [[ ! "$PR_BRANCH" =~ ^(feature|bug|hotfix)\/RSP-LSDIVISON-[0-9]{4}$ && ! "$PR_BRANCH" =~ ^(main|release|staging)(\/.*)?$ ]]; then
+            echo "Error: Invalid branch name format."
+            echo "Branch name must start with one of the following: 'feature/', 'bug/', 'hotfix/', 'main', 'release', or 'staging', followed by 'RSP-LSDIVISON-' and a 4-digit number, or optionally followed by any characters after 'main/', 'release/', or 'staging/'."
+            exit 1
+          else
+            echo "Branch name is valid: $PR_BRANCH"
+          fi
