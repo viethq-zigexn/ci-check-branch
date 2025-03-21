@@ -9,11 +9,10 @@ jobs:
   validate_branch_name:
     runs-on: 'ubuntu-latest'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+
       - name: Validate branch name and PR creator from VN
         run: |
-          BRANCH_NAME="${GITHUB_REF##*/}"
+          BRANCH_NAME="${GITHUB_HEAD_REF}"
           PR_CREATOR="${GITHUB_ACTOR}"
           echo "BRANCH_NAME: $BRANCH_NAME"
           echo "PR_CREATOR: $PR_CREATOR"
