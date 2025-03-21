@@ -15,7 +15,7 @@ jobs:
           PR_CREATOR="${GITHUB_ACTOR}"
           
           IS_VN_DEV=$([[ "$PR_CREATOR" =~ -zigexn$ ]] && echo true || echo false)
-          IS_VALID_FORMAT=$([[ "$BRANCH_NAME" =~ "^(feature|bug|hotfix|revert|business-rollback)/RSP-LSDIVISON-[0-9]+$" ]] && echo true || echo false)
+          IS_VALID_FORMAT=$([[ "$BRANCH_NAME" =~ ^(feature|bug|hotfix|revert|business-rollback)/RSP-LSDIVISON-[0-9]+$ ]] && echo true || echo false)
           IS_VN_CONTRIBUTE=$([[ "$BRANCH_NAME" =~ "^vn_contribution" ]] && echo true || echo false)
 
           if [[ "$IS_VN_DEV" == "true" ]] && ([[ "$IS_VALID_FORMAT" == "true" ]] || [[ "$IS_VN_CONTRIBUTE" == "true" ]]); then
