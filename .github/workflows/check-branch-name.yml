@@ -9,13 +9,15 @@ jobs:
   validate_branch_name:
     runs-on: 'ubuntu-latest'
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Validate branch name and PR creator from VN
         run: |
           BRANCH_NAME="${GITHUB_REF##*/}"
           PR_CREATOR="${GITHUB_ACTOR}"
           echo "BRANCH_NAME: $BRANCH_NAME"
           echo "PR_CREATOR: $PR_CREATOR"
-          
+
           IS_VN_DEV=$([[ "$PR_CREATOR" =~ -zigexn$ ]] && echo true || echo false)
           IS_VALID_FORMAT=$([[ "$BRANCH_NAME" =~ ^(feature|bug|hotfix|revert|business-rollback)/RSP-LSDIVISON-[0-9]+$ ]] && echo true || echo false)
           IS_VN_CONTRIBUTE=$([[ "$BRANCH_NAME" =~ ^vn_contribution ]] && echo true || echo false)
