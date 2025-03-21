@@ -1,28 +1,30 @@
-name: Validate Branch Name for Merge into Main
+name: Validate Branch Name
 
 on:
   pull_request:
     branches:
-      - main  # Chạy CI chỉ khi có pull request merge vào nhánh `main`
+      - main
 
 jobs:
   validate_branch_name:
-    runs-on: ubuntu-latest
-
+    runs-on: 'ubuntu-latest'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Validate branch name
+      - name: Validate branch name and PR creator from VN
         run: |
-          # Lấy tên nhánh từ pull request
-          PR_BRANCH=$(echo $GITHUB_HEAD_REF)
+          BRANCH_NAME="${GITHUB_REF##*/}"
+          PR_CREATOR="${GITHUB_ACTOR}"
+          
+          IS_VN_DEV=$([[ "$PR_CREATOR" =~ "-zigexn$" ]] && echo true || echo false)
+          IS_VALID_FORMAT=$([[ "$BRANCH_NAME" =~ "^(feature|bug|hotfix|revert|business-rollback)/RSP-LSDIVISON-[0-9]+$" ]] && echo true || echo false)
+          IS_VN_CONTRIBUTE=$([[ "$BRANCH_NAME" =~ "^vn_contribution" ]] && echo true || echo false)
 
-          # Kiểm tra tên nhánh
-          if [[ ! "$PR_BRANCH" =~ ^(feature|bug|hotfix)\/RSP-LSDIVISON-[0-9]{4}$ && ! "$PR_BRANCH" =~ ^(main|release|staging)(\/.*)?$ ]]; then
-            echo "Error: Invalid branch name format."
-            echo "Branch name must start with one of the following: 'feature/', 'bug/', 'hotfix/', 'main', 'release', or 'staging', followed by 'RSP-LSDIVISON-' and a 4-digit number, or optionally followed by any characters after 'main/', 'release/', or 'staging/'."
-            exit 1
+          if [[ "$IS_VN_DEV" == "true" ]] && ([[ "$IS_VALID_FORMAT" == "true" ]] || [[ "$IS_VN_CONTRIBUTE" == "true" ]]); then
+            echo "✅ Validation passed: Branch name and PR creator are valid"
           else
-            echo "Branch name is valid: $PR_BRANCH"
+            echo "❌ Validation failed"
+            echo "Details:"
+            echo "- Is VN Developer: ${IS_VN_DEV}"
+            echo "- Has Valid Format: ${IS_VALID_FORMAT}"
+            echo "- Is VN Contribution: ${IS_VN_CONTRIBUTE}"
+            exit 1
           fi
